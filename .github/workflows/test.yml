@@ -1,6 +1,19 @@
 name: Test
 
-on: [push, pull_request]
+permissions:
+  contents: read
+  actions: read
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      fastci:
+        description: 'Enable FastCI acceleration'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   test:
@@ -12,6 +25,12 @@ jobs:
         go: ["1.18", "1.19", "1.22"]
     steps:
       - uses: actions/checkout@v3
+      - name: FastCI
+        if: ${{ fromJSON(github.event.inputs.fastci || 'false') }}
+        uses: jfrog-fastci/fastci@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          fastci_otel_token: ${{ vars.FASTCI_TOKEN }}
 
       # Install Go
       - name: Setup Go
