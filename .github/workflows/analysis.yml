@@ -1,5 +1,17 @@
 name: "Static Analysis"
-on: [push, pull_request]
+permissions:
+  contents: read
+  actions: read
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      fastci:
+        description: 'Enable FastCI'
+        type: boolean
+        required: false
+        default: false
 jobs:
   Go-Lint:
     name: Lint
@@ -7,6 +19,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: FastCI
+        if: ${{ fromJSON(github.event.inputs.fastci || 'false') }}
+        uses: jfrog-fastci/fastci@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          fastci_otel_token: ${{ vars.FASTCI_TOKEN }}
       - name: Install Go
         uses: actions/setup-go@v3
         with:
@@ -19,6 +37,12 @@ jobs:
     steps:
       - name: Checkout Source
         uses: actions/checkout@v3
+      - name: FastCI
+        if: ${{ fromJSON(github.event.inputs.fastci || 'false') }}
+        uses: jfrog-fastci/fastci@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          fastci_otel_token: ${{ vars.FASTCI_TOKEN }}
       - name: Install Go
         uses: actions/setup-go@v3
         with:
@@ -34,6 +58,12 @@ jobs:
     steps:
       - name: Checkout Source
         uses: actions/checkout@v3
+      - name: FastCI
+        if: ${{ fromJSON(github.event.inputs.fastci || 'false') }}
+        uses: jfrog-fastci/fastci@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          fastci_otel_token: ${{ vars.FASTCI_TOKEN }}
       - name: Install Go
         uses: actions/setup-go@v3
         with:
